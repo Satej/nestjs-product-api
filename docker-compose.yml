@@ -1,0 +1,51 @@
+version: '3'
+services:
+  api:
+    build: ./api
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+      - cache
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=changeme
+      - DB_PASS=changeme
+      - DB_NAME=changeme
+      - NODE_ENV=dev
+      - PORT=3000
+      - HOST=0.0.0.0
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - CURRENCYAPI_KEY=REPLACE_WITH_YOUR_API_KEY
+    command: npm run start
+  
+  cache:
+    image: redis:7.2.4-alpine
+    ports:
+      - 6379:6379
+
+  db:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_USER: changeme
+      MYSQL_PASSWORD: changeme
+      MYSQL_DATABASE: changeme
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+
+volumes:
+  db_data:
